@@ -1,0 +1,33 @@
+# Select events with exactly one  lepton
+1 hard lep: nLep == 1 && Lep_pt > 25
+
+# Lepton needs to be antiselected
+Selected: Selected == -1
+
+# Veto events with additional leptons
+No veto lep: nVeto == 0
+
+# Fire at least one trigger
+Trigger: !isData || (HLT_EleOR || HLT_MuOR || HLT_MetOR)
+
+# Prevent double counting from different datasets
+Trigger XOR: !isData || ( (PD_SingleEle && HLT_EleOR) || (PD_SingleMu && (HLT_MuOR) && !(HLT_EleOR) ) || (PD_MET && (HLT_MetOR) && !(HLT_EleOR) && !(HLT_MuOR) )  )
+
+# Apply filters
+Filters: !isData || METfilters == 1
+
+# Isolated track veto
+Iso veto: !iso_Veto
+
+# Ghost Muon filters
+MET/met_caloPt <= 5: MET/met_caloPt <= 5
+Mu jet filter: RA2_muJetFilter == 1
+
+# FastSim jet veto
+FastSim jet veto: Flag_fastSimCorridorJetCleaning
+
+# Second leading jet pT larger than 80 GeV
+Jet2_pt > 80: Jet2_pt > 80
+
+# Apply HEM
+HEM: (!isData || ((Run >= 319077) && (nHEMJetVeto == 0 && nHEMEleVeto == 0)) || (Run < 319077))

@@ -7,6 +7,40 @@ import glob
 from makeYieldTables_0b import *
 #from yieldClass import *
 
+def PrintSignalSystematics(yds, header_names,dirName , file_name, var, systs, mGo, mLSP):
+
+    samps = [("T5qqqqWW_Scan_{}_syst_mGo{}_mLSP{}".format(syst,mGo,mLSP),b)
+            for syst in systs
+            for b in bindirs
+            if mGo >= mLSP
+            ]
+
+    yds = yds.getMixDict(samps)
+
+    f =  open(dirName + "/" + file_name + "mGo{}_mLSP{}.dat".format(mGo, mLSP),'w')
+    print "Writing systematics for", dirName + "/" + file_name + "mGo{}_mLSP{}.dat".format(mGo, mLSP)
+    bins = sorted(yds.keys())
+    precision = 5  # |  SBin
+    f.write('bin                 |' +  ' %s ' % '     |   '.join(map(str, header_names)) + ' \n')
+    for i,bin in enumerate(bins):
+        bin_yds = [i for i in yds[bin] if i != 0]
+        vals = [v
+            for v in bin_yds
+            if v.name.endswith("mGo{}_mLSP{}".format(mGo, mLSP))
+            ]
+        f.write(bin + '')
+        for i,yd in enumerate(vals):
+
+            if yd ==0:
+                val=0
+            else:
+                val = abs(yd.val)
+            f.write(('  |    %.'+str(precision)+'f   ' ) % (1+val))
+        f.write('\n')
+    f.close()
+    return 1
+
+
 if __name__ == "__main__":
 
     ## remove '-b' option
@@ -31,7 +65,10 @@ if __name__ == "__main__":
     elif "2018" in pattern:
         year = "2018"
 
-    dirName = "signal_syst_tables_{}".format(year)
+    #dirName = "signal_syst_tables_new_{}".format(year)
+    dirName = "signal_syst_tables_proper_{}".format(year)
+    if '--test' in sys.argv:
+        dirName = "signal_syst_tables_proper_dilep_{}".format(year)
     if not os.path.exists(dirName):
         os.mkdir(dirName)
         print("Directory " , dirName ,  " Created ")
@@ -39,63 +76,36 @@ if __name__ == "__main__":
         print("Directory " , dirName ,  " already exists")
 
     # Define storage
-    yds5 = YieldStore("lepYields")
-    yds67 = YieldStore("lepYields")
-    yds8 = YieldStore("lepYields")
-    ydsMu5 = YieldStore("muYields")
-    ydsMu67 = YieldStore("muYields")
-    ydsMu8 = YieldStore("muYields")
+    yds = YieldStore("lepYields")
+    ydsMu = YieldStore("muYields")
 
-    yds5.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ5*", ("lep","sele"))
-    yds67.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ67*", ("lep","sele"))
-    yds8.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ8i*", ("lep","sele"))
-    ydsMu5.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ5*", ("mu","sele"))
-    ydsMu67.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ67*", ("mu","sele"))
-    ydsMu8.addFromFiles("yield_0b_premerge_" + year + "_prepSyst/signal_*/merged/LT*NJ8i*", ("mu","sele"))
+    if '--test' in sys.argv:
+        dirName = "signal_syst_tables_proper_dilep_{}".format(year)
+        yds.addFromFiles( "yield_0b_postmerge_" + year + "_prepSyst/signal_*/merged/LT1_HT0_NB0_NJ5_NW0*", ("lep","sele"))
+        ydsMu.addFromFiles( "yield_0b_postmerge_" + year + "_prepSyst/signal_*/merged/LT1_HT0_NB0_NJ5_NW0*", ("mu","sele"))
+    else:
+        yds.addFromFiles( "yield_0b_postmerge_" + year + "_prepSyst/signal_*/merged/LT*", ("lep","sele"))
+        ydsMu.addFromFiles( "yield_0b_postmerge_" + year + "_prepSyst/signal_*/merged/LT*", ("mu","sele"))
 
     systs = glob.glob('{}/signal_*'.format(pattern))
     systs = [syst[syst.find('signal_')+7:] for syst in systs]
     systsprint = systs
 
-    #FIXME
     var = "T5qqqqWW_Scan"
     bindirs =  ['SR_MB','CR_MB','SR_SB','CR_SB', "SR_SB_NB1i", "CR_SB_NB1i", "SR_SB_NB0", "CR_SB_NB0"]
 
-    # kinda hacky, but if you append both times, it fails
-    f_dat =  open(dirName+'/signalTablev1_{}.dat'.format(year),'w')
+    print "Writing files in", dirName
 
     caption = 'Zero-b analysis: Systematic uncertainties on Signal for different sources {}'.format(year)
 
-    #for mGo in range(600, 2800, 25):
-    #   for mLSP in range(0,1800,25):
+    massDf = read_csv("massFile.md")
+    MGO = massDf["mGo"].values
+    MLSP = massDf["mLSP"].values
 
-    mLSP_list = [   0,  100,  200,  300,  400,  450,  475,  500,  525,  550,  575,
-            600,  625,  650,  675,  700,  725,  750,  775,  800,  825,  850,
-            875,  900,  950,  975, 1000, 1050, 1075, 1100, 1125, 1150, 1175,
-           1200, 1250, 1300, 1350, 1400, 1425, 1450, 1500, 1550, 1600, 1650,
-           1700, 1750, 1800, 1850, 1900]
-
-    samps = [("T5qqqqWW_Scan_{}_syst_mGo{}_mLSP{}".format(syst,mGo,mLSP),b)
-            for syst in systs
-            for b in bindirs
-            for mGo in range(600, 2600, 50) # previously ,2800, 25, but not found for 0b
-            for mLSP in mLSP_list #range(0,1800,25)
-            if mGo >= mLSP
-            ]
     header_names = [b+"_"+syst
                    for syst in systsprint
                    for b in bindirs]
 
-    label = '5 jet bins, relative uncertainties given in \%'
-    yds5.printSignalTable(samps, header_names, dirName, 'signalTablev1_{}_'.format(year), var, systs)
-    ydsMu5.printSignalTable(samps, header_names, dirName, 'signalTablev1_Mu_{}_'.format(year), var, systs)
-
-    label = '6,7 jet bins, relative uncertainties given in \%'
-    yds67.printSignalTable(samps, header_names, dirName, 'signalTablev1_{}_'.format(year), var, systs)
-    ydsMu67.printSignalTable(samps, header_names, dirName, 'signalTablev1_Mu_{}_'.format(year), var, systs)
-
-    label = '8 jet bins, relative uncertainties given in \%'
-    yds8.printSignalTable(samps, header_names, dirName, 'signalTablev1_{}_'.format(year), var, systs)
-    ydsMu8.printSignalTable(samps, header_names, dirName, 'signalTablev1_Mu_{}_'.format(year), var, systs)
-
-    f_dat.close()
+    for mGo, mLSP in zip(MGO, MLSP):
+        PrintSignalSystematics(yds, header_names, dirName, 'signalTablev1_{}_'.format(year), var, systs, mGo, mLSP)
+        PrintSignalSystematics(ydsMu, header_names, dirName, 'signalTablev1_Mu_{}_'.format(year), var, systs, mGo, mLSP)

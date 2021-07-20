@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# Script to make plots
+# You need to have symbolic links called "trees_YEAR" and "friends_YEAR", pointing to your
+# trees and friend trees, resp.
+
+
+# Required arguments
+while getopts s:c:y:m:l: flag
+do
+    case "${flag}" in
+        s) systematic="${OPTARG}" ;;
+        c) cut_selection="${OPTARG}" ;;
+        y) year="${OPTARG}" ;;
+        m) mca_file="${OPTARG}" ;;
+        l) luminosity="${OPTARG}" ;;
+    esac
+done
+
+lumi=${luminosity}
+
+base_path=$CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/susy-1lep/nBJet_template_fits
+mca=$base_path/mca/${year}/${mca_file}
+plots=$base_path/nBJet_distributions/nBJet_plots_0b_templateFit.txt 
+
+if [ "$year" == "2018" ]
+then
+    cuts=$base_path/cuts/1l_basicCuts_0b_templateFit_${cut_selection}_2018.txt
+else
+    cuts=$base_path/cuts/1l_basicCuts_0b_templateFit_${cut_selection}.txt
+fi
+
+print_dir=$base_path/nBJet_distributions/${year}/${systematic}/${cut_selection}
+out_file=$print_dir/nBJets_${year}_${systematic}_${cut_selection}.root
+
+trees=$CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/trees_${year}/
+friends=$CMSSW_BASE/src/CMGTools/TTHAnalysis/python/plotter/friends_${year}/evVarFriend_{cname}.root
+
+python $base_path/../../mcPlots_after_ext_scale.py \
+    "${mca}" \
+    "${cuts}" \
+    "${plots}" \
+    --pdir "${print_dir}" \
+    -o "${out_file}" \
+    -P "${trees}" \
+    -F sf/t "${friends}" \
+    -l "${lumi}" \
+    -j $(nproc) \
+    --tree treeProducerSusySingleLepton \
+    -G \
+    -f \
+    --print "png,txt" \
+    --legendFontSize 0.02 \
+    --showRatio \
+    --maxRatioRange 0.05 1.95 \
+    --fixRatioRange \
+    --noErrorBandOnRatio \
+    --noStackSig \
+    --showIndivSigs \
+    --scaleBkgToData TTJets \
+    --scaleBkgToData WJets \
+    --scaleBkgToData QCD \
+    --scaleBkgToData Other
+
+

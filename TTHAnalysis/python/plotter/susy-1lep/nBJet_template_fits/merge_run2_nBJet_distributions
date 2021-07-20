@@ -1,0 +1,141 @@
+#!/bin/sh
+# Run this script to merge the nBJet distributions after they have been produced for the three separate years
+
+PLOTS_2016=nBJet_distributions/2016_EXT
+PLOTS_2017=nBJet_distributions/2017
+PLOTS_2018=nBJet_distributions/2018
+MERGED=nBJet_distributions/merged
+
+if [ ! -d ${MERGED} ]
+then
+    echo "Creating a directory for the merged plots: ${MERGED}"
+    mkdir ${MERGED}
+fi
+
+# First merge the nominal and dilep-corr histograms
+NOMINAL_INCLUSIVE_2016=(${PLOTS_2016}/nominal/inclusive/*.root)
+NOMINAL_INCLUSIVE_2017=(${PLOTS_2017}/nominal/inclusive/*.root)
+NOMINAL_INCLUSIVE_2018=(${PLOTS_2018}/nominal/inclusive/*.root)
+
+if [ ! -d ${MERGED}/nominal/inclusive ]
+then
+    mkdir -p ${MERGED}/nominal/inclusive  
+fi
+hadd ${MERGED}/nominal/inclusive/nBJets_merged_nominal_inclusive.root \
+    ${NOMINAL_INCLUSIVE_2016} \
+    ${NOMINAL_INCLUSIVE_2017} \
+    ${NOMINAL_INCLUSIVE_2018}
+
+NOMINAL_ANTISEL_2016=(${PLOTS_2016}/nominal/antiselected/*.root)
+NOMINAL_ANTISEL_2017=(${PLOTS_2017}/nominal/antiselected/*.root)
+NOMINAL_ANTISEL_2018=(${PLOTS_2018}/nominal/antiselected/*.root)
+
+if [ ! -d ${MERGED}/nominal/antiselected ]
+then
+    mkdir -p ${MERGED}/nominal/antiselected
+fi
+hadd ${MERGED}/nominal/antiselected/nBJets_merged_nominal_antiselected.root \
+    ${NOMINAL_ANTISEL_2016} \
+    ${NOMINAL_ANTISEL_2017} \
+    ${NOMINAL_ANTISEL_2018}
+
+DILEPCORR_INCLUSIVE_2016=(${PLOTS_2016}/dilep-corr/inclusive/*.root)
+DILEPCORR_INCLUSIVE_2017=(${PLOTS_2017}/dilep-corr/inclusive/*.root)
+DILEPCORR_INCLUSIVE_2018=(${PLOTS_2018}/dilep-corr/inclusive/*.root)
+
+if [ ! -d ${MERGED}/dilep-corr/inclusive ]
+then
+    mkdir -p ${MERGED}/dilep-corr/inclusive  
+fi
+hadd ${MERGED}/dilep-corr/inclusive/nBJets_merged_dilep-corr_inclusive.root \
+    ${DILEPCORR_INCLUSIVE_2016} \
+    ${DILEPCORR_INCLUSIVE_2017} \
+    ${DILEPCORR_INCLUSIVE_2018}
+
+DILEPCORR_ANTISEL_2016=(${PLOTS_2016}/dilep-corr/antiselected/*.root)
+DILEPCORR_ANTISEL_2017=(${PLOTS_2017}/dilep-corr/antiselected/*.root)
+DILEPCORR_ANTISEL_2018=(${PLOTS_2018}/dilep-corr/antiselected/*.root)
+
+if [ ! -d ${MERGED}/dilep-corr/antiselected ]
+then
+    mkdir -p ${MERGED}/dilep-corr/antiselected
+fi
+hadd ${MERGED}/dilep-corr/antiselected/nBJets_merged_dilep-corr_antiselected.root \
+    ${DILEPCORR_ANTISEL_2016} \
+    ${DILEPCORR_ANTISEL_2017} \
+    ${DILEPCORR_ANTISEL_2018}
+
+# 2016 systematics loop
+for DIR in ${PLOTS_2016}/*
+do
+    SYST=${DIR/#"$PLOTS_2016/"}
+    if [ ${SYST} == "nominal" ] || [ ${SYST} == "dilep-corr" ]
+    then
+        :
+    else
+        for SEL in inclusive antiselected
+        do
+            if [ ! -d ${MERGED}/${SYST}_2016_EXT/${SEL} ]
+            then
+                mkdir -p ${MERGED}/${SYST}_2016_EXT/${SEL}
+            fi
+            SYST_VAR_2016=(${PLOTS_2016}/${SYST}/${SEL}/*.root)
+            NOMINAL_2017=(${PLOTS_2017}/nominal/${SEL}/*.root)
+            NOMINAL_2018=(${PLOTS_2018}/nominal/${SEL}/*.root)
+            hadd ${MERGED}/${SYST}_2016_EXT/${SEL}/nBJets_merged_${SYST}_2016_EXT_${SEL}.root \
+                ${SYST_VAR_2016} \
+                ${NOMINAL_2017} \
+                ${NOMINAL_2018}
+        done
+    fi
+done
+
+# 2017 systematics loop
+for DIR in ${PLOTS_2017}/*
+do
+    SYST=${DIR/#"$PLOTS_2017/"}
+    if [ ${SYST} == "nominal" ] || [ ${SYST} == "dilep-corr" ]
+    then
+        :
+    else
+        for SEL in inclusive antiselected
+        do
+            if [ ! -d ${MERGED}/${SYST}_2017/${SEL} ]
+            then
+                mkdir -p ${MERGED}/${SYST}_2017/${SEL}
+            fi
+            SYST_VAR_2017=(${PLOTS_2017}/${SYST}/${SEL}/*.root)
+            NOMINAL_2016=(${PLOTS_2016}/nominal/${SEL}/*.root)
+            NOMINAL_2018=(${PLOTS_2018}/nominal/${SEL}/*.root)
+            hadd ${MERGED}/${SYST}_2017/${SEL}/nBJets_merged_${SYST}_2017_${SEL}.root \
+                ${SYST_VAR_2017} \
+                ${NOMINAL_2016} \
+                ${NOMINAL_2018}
+        done
+    fi
+done
+
+# 2018 systematics loop
+for DIR in ${PLOTS_2018}/*
+do
+    SYST=${DIR/#"$PLOTS_2018/"}
+    if [ ${SYST} == "nominal" ] || [ ${SYST} == "dilep-corr" ]
+    then
+        :
+    else
+        for SEL in inclusive antiselected
+        do
+            if [ ! -d ${MERGED}/${SYST}_2018/${SEL} ]
+            then
+                mkdir -p ${MERGED}/${SYST}_2018/${SEL}
+            fi
+            SYST_VAR_2018=(${PLOTS_2018}/${SYST}/${SEL}/*.root)
+            NOMINAL_2016=(${PLOTS_2016}/nominal/${SEL}/*.root)
+            NOMINAL_2017=(${PLOTS_2017}/nominal/${SEL}/*.root)
+            hadd ${MERGED}/${SYST}_2018/${SEL}/nBJets_merged_${SYST}_2018_${SEL}.root \
+                ${SYST_VAR_2018} \
+                ${NOMINAL_2016} \
+                ${NOMINAL_2017}
+        done
+    fi
+done

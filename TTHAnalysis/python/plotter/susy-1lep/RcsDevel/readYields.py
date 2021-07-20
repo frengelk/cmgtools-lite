@@ -17,7 +17,7 @@ def getLepYield(hist,leptype = ('lep','sele')):
         return (hist.GetBinContent(1),hist.GetBinError(1))
 
 #    elif hist.GetNbinsX() == 4 and hist.GetNbinsY() == 2:
-    
+
     elif hist.GetNbinsX() <= 5 and hist.GetNbinsY() <= 3:
 
         if leptype == ('mu','anti'):
@@ -71,7 +71,11 @@ def getScanYields(hist,leptype = ('lep','sele')):
                 else:
                     ycnt = ydict[point]
                 if 'syst' in hist.GetName():
-                    ycnt = (ycnt[0] / 2.0, ycnt[1] / 2.0)
+                    #ycnt = (ycnt[0] / 2.0, ycnt[1] / 2.0)
+                    if mupoint in ydict:
+                        ycnt = ((ydict[point][0]**2 + ydict[mupoint][0]**2)**.5, hypot(ydict[point][1], ydict[mupoint][1]))
+                    else:
+                        ycnt = ydict[point]
                 ret[point] = ycnt
 
     elif leptype[0] == 'ele':

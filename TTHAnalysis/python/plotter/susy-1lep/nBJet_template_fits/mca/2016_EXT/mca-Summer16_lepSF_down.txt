@@ -1,0 +1,100 @@
+# MCA file for Summer16 samples with ext files
+
+### Lepton SF variation down
+# TTbar
+TTJets                 : TTJets_DiLepton             : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_DiLepton_ext             : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_SingleLeptonFromT    : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_SingleLeptonFromT_ext    : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_SingleLeptonFromTbar : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_SingleLeptonFromTbar_ext : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : lheHTIncoming <= 600; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_LO_HT600to800_ext        : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : 1; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_LO_HT800to1200_ext       : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : 1; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_LO_HT1200to2500_ext      : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : 1; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+TTJets                 : TTJets_LO_HT2500toInf_ext       : Xsec*1*btagSF*nISRttweight*puRatio*(lepSF-lepSFerr) : 1; FillColor=ROOT.kBlue, Label="t\#bar{t} + jets"
+
+# W+Jets
+WJets    : WJetsToLNu_HT400to600   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT400to600_ext   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT600to800   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT600to800_ext   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT800to1200  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT800to1200_ext  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT1200to2500 : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT1200to2500_ext : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT2500toInf  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets    : WJetsToLNu_HT2500toInf_ext  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr)  ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets : WZTo1L1Nu2Q    : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets : WWToLNuQQ      : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label="W+jets", FillColor=ROOT.kGreen-2
+WJets : WWToLNuQQ_ext      : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label="W+jets", FillColor=ROOT.kGreen-2
+
+# QCD
+QCD      : QCD_HT500to700          : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT500to700_ext          : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT700to1000         : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT1000to1500        : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT1000to1500_ext        : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT1500to2000        : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT1500to2000_ext        : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT2000toInf         : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+QCD      : QCD_HT2000toInf_ext         : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; Label ="QCD", FillColor=ROOT.kCyan-6
+
+# Single Top
+Other : TToLeptons_sch_amcatnlo           : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : T_tch_powheg             : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : TBar_tch_powheg          : 80.95*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : TBar_tWch_noFullyHad                : 19.55*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : TBar_tWch_noFullyHad_ext                : 19.55*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : T_tWch_noFullyHad                   : 19.55*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : T_tWch_noFullyHad_ext                   : 19.55*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+
+# Drell-Yan
+Other      : DYJetsToLL_M50_HT400to600   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+Other      : DYJetsToLL_M50_HT400to600_ext   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+Other      : DYJetsToLL_M50_HT600to800   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+Other      : DYJetsToLL_M50_HT800to1200  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+Other      : DYJetsToLL_M50_HT1200to2500 : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+Other      : DYJetsToLL_M50_HT2500toInf  : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.5
+
+# TTV
+Other : TTWToLNu_ext      : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.2
+Other : TTWToQQ       : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.2
+Other : TTZToLLNuNu_ext   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.2
+Other : TTZToLLNuNu_ext2   : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.2
+Other : TTZToQQ       : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other", NormSystematic=0.2
+
+# DiBoson
+Other : WZTo1L3Nu      : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : WZTo2L2Q       : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : ZZTo2L2Nu      : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+Other : ZZTo2L2Q       : Xsec*1*btagSF*puRatio*(lepSF-lepSFerr) ; FillColor = ROOT.kViolet+5, Label="Other"
+
+
+# DATA
+
+# SingleElectron
+data: SingleElectron_Run2016B_17Jul2018_v2
+data: SingleElectron_Run2016C_17Jul2018
+data: SingleElectron_Run2016D_17Jul2018
+data: SingleElectron_Run2016E_17Jul2018
+data: SingleElectron_Run2016F_17Jul2018
+data: SingleElectron_Run2016G_17Jul2018
+data: SingleElectron_Run2016H_17Jul2018_v1
+
+# SingleMuon
+data: SingleMuon_Run2016B_17Jul2018_v2
+data: SingleMuon_Run2016C_17Jul2018
+data: SingleMuon_Run2016D_17Jul2018
+data: SingleMuon_Run2016E_17Jul2018
+data: SingleMuon_Run2016F_17Jul2018
+data: SingleMuon_Run2016G_17Jul2018
+data: SingleMuon_Run2016H_17Jul2018_v1
+
+# MET
+data: MET_Run2016B_17Jul2018_v2
+data: MET_Run2016C_17Jul2018
+data: MET_Run2016D_17Jul2018
+data: MET_Run2016E_17Jul2018
+data: MET_Run2016F_17Jul2018
+data: MET_Run2016G_17Jul2018
+data: MET_Run2016H_17Jul2018_v1

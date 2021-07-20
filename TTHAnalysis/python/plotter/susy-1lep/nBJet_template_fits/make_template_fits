@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Required arguments
+while getopts s:f:o: flag
+do
+    case "${flag}" in
+        s) systematic="${OPTARG}" ;;
+        f) fratio_file="${OPTARG}" ;;
+        o) out_dir="${OPTARG}" ;;
+    esac
+done
+
+base_path=${CMSSW_BASE}/src/CMGTools/TTHAnalysis/python/plotter
+plots_path=${base_path}/susy-1lep/nBJet_template_fits/nBJet_distributions/merged/${systematic}
+
+inclusive_hists=${plots_path}/inclusive/nBJets_merged_${systematic}_inclusive.root
+antiselected_hists=${plots_path}/antiselected/nBJets_merged_${systematic}_antiselected.root
+
+fratio_path=${base_path}/susy-1lep/RcsDevel/${fratio_file}
+out_path=${base_path}/susy-1lep/nBJet_template_fits/template_fit_out/${out_dir}
+
+python ${base_path}/susy-1lep/nBJet_template_fits/template_fit_nBJet.py \
+    --syst "${systematic}" \
+    --inclusive "${inclusive_hists}" \
+    --antiselected "${antiselected_hists}" \
+    --f-ratios "${fratio_path}" \
+    --out "${out_path}" \
+#    --verbose \
+#    --ratio-plots 
+
