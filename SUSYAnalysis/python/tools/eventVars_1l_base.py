@@ -313,7 +313,8 @@ class EventVars1L_base:
             "prefireW","prefireWup","prefireWdwn",
 ################################################### to get all the variables in the FR rather than trees ##############################################
             "met_caloPt","lheHTIncoming","genTau_grandmotherId","genTau_motherId","genLep_grandmotherId","genLep_motherId","DiLep_Flag","semiLep_Flag",
-            
+            ### new
+            "pMSSM_id1", "pMSSM_id2",
             ]
 
     def listBranches(self):
@@ -372,13 +373,13 @@ class EventVars1L_base:
         if hasattr(event, 'isData'):
             ret['isData'] = event.isData
 
-        
+
         genJets = []
         genbJets = []
         genJets30 = []
         genbJets30 = []
-        # for checking the nGenBjets and nGenJets differences between 16/17 PS tunes and put every thing to FR rather than trees 
-        if not event.isData : 
+        # for checking the nGenBjets and nGenJets differences between 16/17 PS tunes and put every thing to FR rather than trees
+        if not event.isData :
             genparts = [l for l in Collection(event,"GenPart","nGenPart")]
             for Gj in genparts:
                 if (Gj.status !=23 or abs(Gj.pdgId) > 5): continue
@@ -390,37 +391,37 @@ class EventVars1L_base:
             if hasattr(event,'lheHTIncoming')        : ret["lheHTIncoming"]        = event.lheHTIncoming
             genpTaus = [l for l in Collection(event,"genTau")]
             genpLeps = [l for l in Collection(event,"genLep")]
-            for gtau in genpTaus : 
+            for gtau in genpTaus :
                 ret["genTau_grandmotherId"] = gtau.grandmotherId
                 ret["genTau_motherId"]      = gtau.motherId
-            for glep in genpLeps : 
-                ret["genLep_grandmotherId"] = glep.grandmotherId 
+            for glep in genpLeps :
+                ret["genLep_grandmotherId"] = glep.grandmotherId
                 ret["genLep_motherId"]      = glep.motherId
-                
+
             # add flag to distinguish between semilep/DiLep TTBar
             if "TTJets_DiLepton" in self.sample :
-                if event.lheHTIncoming <= 600 : 
+                if event.lheHTIncoming <= 600 :
                     ret["DiLep_Flag"] = 1
                 else : ret["DiLep_Flag"] = 0
-                
+
             if "TTJets_SingleLepton" in self.sample :
-                if event.lheHTIncoming <= 600 : 
+                if event.lheHTIncoming <= 600 :
                     ret["semiLep_Flag"] = 1
                 else : ret["semiLep_Flag"] = 0
-                
+
             if "TTJets_LO_HT" in self.sample :
                 gtau_sum = sum([(abs(gt.grandmotherId)==6 and abs(gt.motherId)==24) for gt in genpTaus])
                 glep_sum = sum([(abs(gl.grandmotherId)==6 and abs(gl.motherId)==24) for gl in genpLeps])
-                if  ((gtau_sum + glep_sum) == 2) : 
+                if  ((gtau_sum + glep_sum) == 2) :
                     ret["DiLep_Flag"] = 1
                     ret["semiLep_Flag"] = 0
-                elif  ((gtau_sum + glep_sum)) < 2 : 
+                elif  ((gtau_sum + glep_sum)) < 2 :
                     ret["semiLep_Flag"] = 1
                     ret["DiLep_Flag"] = 0
-                else : 
+                else :
                     ret["DiLep_Flag"] = 0
                     ret["semiLep_Flag"] = 0
-                    
+
         ret["nGenJets"] = len(genJets)
         ret["nGenbJets"] = len(genbJets)
         ret["nGenJets30"] = len(genJets30)
@@ -719,7 +720,7 @@ class EventVars1L_base:
             ret['Lep_miniIso'] = leps[0].miniRelIso
             if hasattr(leps[0],"hOverE"):
                 ret['Lep_hOverE'] = leps[0].hOverE
-        else : 
+        else :
             ret['Lep_pt'] = -999
             ret['Lep_relIso'] = -999
             ret['Lep_miniIso'] = -999
@@ -754,7 +755,7 @@ class EventVars1L_base:
         for i,j in enumerate(jets):
             # Cleaning up of fastsim jets (from "corridor" studies) https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
             if ret['isDPhiSignal']: #only check for signals (see condition check above)
-                if j.pt>20 and abs(j.eta)<2.5 and j.mcPt == 0 and j.chHEF<0.1: ret['Flag_fastSimCorridorJetCleaning'] = 0  
+                if j.pt>20 and abs(j.eta)<2.5 and j.mcPt == 0 and j.chHEF<0.1: ret['Flag_fastSimCorridorJetCleaning'] = 0
             if j.pt>30 and abs(j.eta)<centralEta:
                 centralJet30.append(j)
                 centralJet30idx.append(i)
@@ -823,7 +824,7 @@ class EventVars1L_base:
               ret['FatJet2_phi'] = fatJets[1].phi
               ret['FatJet2_mass'] = fatJets[1].mass
 
-        
+
 #####################################################################################################
 
         ##############################
@@ -900,7 +901,7 @@ class EventVars1L_base:
         BJet_pt_Array = []
         BJet_phi_Array = []
         BJet_eta_Array = []
-     
+
         for i,j in enumerate(cJet30Clean):
             if j.btagCSV > btagWP:
                 BJetMedium30.append(j)
@@ -951,7 +952,7 @@ class EventVars1L_base:
                                     flag_leq_08_Tight+=1
 
 
-                #print flag_leq_08_Loose                        
+                #print flag_leq_08_Loose
                 flag_leq_08_Loose_array.append(flag_leq_08_Loose)
                 if(flag_leq_08_Loose==0):
                        _nBTag_out_Loose+=1
@@ -1032,7 +1033,7 @@ class EventVars1L_base:
 
         ret['BTag_pt_Array'] = BJet_pt_Array
         ret['BTag_phi_Array'] = BJet_phi_Array
-        ret['BTag_eta_Array'] = BJet_eta_Array                   
+        ret['BTag_eta_Array'] = BJet_eta_Array
 #####################################################################################
 
        # if (j.DFprobb + j.DFprobbb) >  0.0574 :
@@ -1064,9 +1065,9 @@ class EventVars1L_base:
         if corrJEC != "central" or smearJER!= "None":
             ## get original jet collection
             metp4 = getRecalcMET(metp4,event,corrJEC,smearJER)
-        
+
         Genmetp4 = ROOT.TLorentzVector(0,0,0,0)
-        
+
         if not event.isData:
             Genmetp4.SetPtEtaPhiM(event.met_genPt,event.met_genEta,event.met_genPhi,0)
 
@@ -1130,7 +1131,9 @@ class EventVars1L_base:
         #####################
         ## SIGNAL REGION FLAG
         #####################
-
+        ret["pMSSM_id1"] = event.pMSSM_id1
+        ret["pMSSM_id2"] = event.pMSSM_id2
+        #from IPython import embed;embed()
         ## Signal region flag
         # isSR SR vs CR flag
         isSR = 0

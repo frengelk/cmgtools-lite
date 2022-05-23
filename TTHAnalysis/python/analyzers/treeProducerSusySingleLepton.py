@@ -25,6 +25,7 @@ susySingleLepton_globalVariables = susyCore_globalVariables + [
             NTupleVariable("met_caloPt", lambda ev : ev.met.caloMETPt(), help="calo met p_{T}"),
             NTupleVariable("met_caloPhi", lambda ev : ev.met.caloMETPhi(), help="calo met phi"),
             NTupleVariable("met_caloSumEt", lambda ev : ev.met.caloMETSumEt(), help="calo met sumEt"),
+            NTupleVariable("FastSimWeightPR31285To36122", lambda ev : ev.FastSimWeightPR31285To36122, help="FastSim event weight to fix LL bug"),
 
             ##--------------------------------------------------
             ## MET filter information (temporary)

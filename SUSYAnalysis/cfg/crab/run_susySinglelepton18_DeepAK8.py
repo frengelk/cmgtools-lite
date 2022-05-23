@@ -13,20 +13,20 @@ from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
 #-------- SET OPTIONS AND REDEFINE CONFIGURATIONS -----------
 
 run80X = getHeppyOption("run80X",False)
-run94X = getHeppyOption("run94X",True)
-run104X = getHeppyOption("run104X",False)
+run94X = getHeppyOption("run94X",False)
+run104X = getHeppyOption("run104X",True)#was false
 
-runData = getHeppyOption("runData", False)
-runMC = getHeppyOption("runMC", True)
-runSig = getHeppyOption("runSig",False)
+runData = getHeppyOption("runData",False)
+runMC = getHeppyOption("runMC",False)
+runSig = getHeppyOption("runSig",True)
 
-runFastsim = getHeppyOption("runFastS",False)
+runFastsim = getHeppyOption("runFastS",True)
 
 
 removeJetReCalibration = getHeppyOption("removeJetReCalibration",False)
 removeJecUncertainty = getHeppyOption("removeJecUncertainty",False)
 doMETpreprocessor = getHeppyOption("doMETpreprocessor",False)
-skipT1METCorr = getHeppyOption("skipT1METCorr",False)
+skipT1METCorr = getHeppyOption("skipT1METCorr",True)
 forcedSplitFactor = getHeppyOption("splitFactor",-1)
 forcedFineSplitFactor = getHeppyOption("fineSplitFactor",-1)
 selectedEvents=getHeppyOption("selectEvents","")
@@ -35,7 +35,8 @@ keepGenPart=getHeppyOption("keepGenPart",False)
 sample = "main"
 test = 0
 multib = False
-zerob = True
+zerob = False
+pMSSM = True
 
 # Lepton Skimming
 ttHLepSkim.minLeptons = 0
@@ -65,7 +66,7 @@ lepAna.loose_electron_pt  = 10
 lepAna.inclusive_electron_pt  = 10
 
 # Lepton Preselection
-### Fall17 V2 is valid for all 2016/17/18 
+### Fall17 V2 is valid for all 2016/17/18
 lepAna.loose_electron_id = "POG_Cuts_ID_FALL17_94X_v2_ConvVetoDxyDz_Veto"
 lepAna.loose_electron_lostHits = 999. # no cut since embedded in ID
 lepAna.loose_electron_dxy    = 999. # no cut since embedded in ID
@@ -80,21 +81,21 @@ lepAna.inclusive_electron_dz     = 999. # no cut since embedded in ID
 isolation = "miniIso"
 
 
-if run80X : 
+if run80X :
 	jetAna.mcGT     = "Summer16_07Aug2017_V11_MC"
 	jetAna.dataGT   = [(1,"Summer16_07Aug2017BCD_V11_DATA"),(276831,"Summer16_07Aug2017EF_V11_DATA"),(278802,"Summer16_07Aug2017GH_V11_DATA")]
 
-elif run94X : 
+elif run94X :
 	jetAna.mcGT     = "Fall17_17Nov2017_V32_MC"
 	jetAna.dataGT   = [(1,"Fall17_17Nov2017B_V32_DATA"),(299337,"Fall17_17Nov2017C_V32_DATA"),(302030,"Fall17_17Nov2017DE_V32_DATA"),(304911,"Fall17_17Nov2017F_V32_DATA")]
 	# to activate the EE noise mitigation
 	metAna.metCollection     = "slimmedMETsModifiedMET"
 	metAna.noPUMetCollection = "slimmedMETsModifiedMET"
 
-elif run104X : 
+elif run104X :
 	jetAna.mcGT     = "Autumn18_V8_MC"
 	jetAna.dataGT   = [(1,"Autumn18_RunA_V8_DATA"),(317080,"Autumn18_RunB_V8_DATA"),(319337,"Autumn18_RunC_V8_DATA"),(320673,"Autumn18_RunD_V8_DATA")]
-	
+
 #jetAna.lepSelCut = lambda lep : False # no cleaning of jets with leptons
 #jetAnaScaleDown.lepSelCut = lambda lep : False # no cleaning of jets with leptons
 #jetAnaScaleUp.lepSelCut = lambda lep : False # no cleaning of jets with leptons
@@ -124,7 +125,42 @@ if not removeJecUncertainty:
     susyCoreSequence.insert(susyCoreSequence.index(metAna)+1, metAnaScaleUp)
 
 
-if isolation == "miniIso": 
+#from PhysicsTools.Heppy.analyzers.objects.FastSimWeightPR31285To36122Appender import *
+from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
+from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
+import PhysicsTools.HeppyCore.framework.config as cfg
+class FastSimWeightPR31285To36122Appender( Analyzer ):
+    def __init__(self, cfg_ana, cfg_comp, looperName ):
+        super(FastSimWeightPR31285To36122Appender,self).__init__(cfg_ana,cfg_comp,looperName)
+    def declareHandles(self):
+        super(FastSimWeightPR31285To36122Appender, self).declareHandles()
+        self.handles['FastSimWeightPR31285To36122'] = AutoHandle( 'FastSimWeightPR31285To36122', 'double' )
+    def beginLoop(self, setup):
+        super(FastSimWeightPR31285To36122Appender,self).beginLoop(setup)
+        self.counters.addCounter('events')
+        count = self.counters.counter('events')
+        count.register('all events')
+    def makeFastSimWeightPR31285To36122(self, event):
+        print "makeFastSimWeightPR31285To36122"
+        self.FastSimWeightPR31285To36122 = self.handles['FastSimWeightPR31285To36122'].product()[0]
+        setattr(event, "FastSimWeightPR31285To36122", self.FastSimWeightPR31285To36122)
+    def process(self, event):
+        self.readCollections( event.input)
+        self.makeFastSimWeightPR31285To36122(event)
+        #print "\nFastSimEvent", event.FastSimWeightPR31285To36122
+        return True
+
+setattr(FastSimWeightPR31285To36122Appender,"defaultConfig", cfg.Analyzer(
+    class_object = FastSimWeightPR31285To36122Appender
+    )
+)
+fsweightpr3 = cfg.Analyzer(
+    FastSimWeightPR31285To36122Appender, name="FastSimWeightPR31285To36122Appender"
+    )
+susyCoreSequence.append(fsweightpr3)
+
+
+if isolation == "miniIso":
     if run80X:
          lepAna.loose_muon_isoCut     = lambda muon : muon.miniRelIso < 0.4
          lepAna.loose_electron_isoCut = lambda elec : elec.miniRelIso < 0.4
@@ -143,7 +179,7 @@ else:
 
 # Switch off slow photon MC matching
 photonAna.do_mc_match = False
-# Loose Tau configuration # we don't have taus so we don't need it 
+# Loose Tau configuration # we don't have taus so we don't need it
 #susyCoreSequence.remove(tauAna)
 tauAna.loose_ptMin = 20
 tauAna.loose_etaMax = 2.3
@@ -173,7 +209,7 @@ ttHJetTauAna = cfg.Analyzer(
 for M in badMuonAna, badMuonAnaMoriond2017, badCloneMuonAnaMoriond2017, badChargedHadronAna:#isoTrackAna,
     susyCoreSequence.remove(M)
 
-from CMGTools.TTHAnalysis.analyzers.treeProducerTTH import * 
+from CMGTools.TTHAnalysis.analyzers.treeProducerTTH import *
 
 #add LHE ana for HT info
 from PhysicsTools.Heppy.analyzers.gen.LHEAnalyzer import LHEAnalyzer
@@ -200,13 +236,13 @@ ttHSTSkimmer = cfg.Analyzer(
 from CMGTools.TTHAnalysis.analyzers.nIsrAnalyzer import NIsrAnalyzer
 NIsrAnalyzer = cfg.Analyzer(
   NIsrAnalyzer, name='NIsrAnalyzer')
-  
+
 if run80X : DataEra_ = '2016BtoH'
 elif run94X : DataEra_ = '2017BtoF'
 
-if not run104X : 
+if not run104X :
     PrefiringAnalyzer.DataEra = DataEra_
-  
+
 
 ## HT skim
 from CMGTools.TTHAnalysis.analyzers.ttHHTSkimmer import ttHHTSkimmer
@@ -243,7 +279,7 @@ susyCoreSequence.insert(susyCoreSequence.index(skimAnalyzer), susyCounter)
 
 
 if not skipT1METCorr:
-    if doMETpreprocessor: 
+    if doMETpreprocessor:
         print "WARNING: you're running the MET preprocessor and also Type1 MET corrections. This is probably not intended."
     jetAna.calculateType1METCorrection = True
     metAna.recalibrate = "type1"
@@ -255,7 +291,7 @@ if not skipT1METCorr:
 
 #-------- SAMPLES AND TRIGGERS -----------
 
-if run80X : 
+if run80X :
 	from CMGTools.RootTools.samples.triggers_13TeV_2016_1l import *
 #-------- TRIGGERS -----------
 	triggerFlagsAna.triggerBits = {
@@ -272,17 +308,17 @@ if run80X :
 		'AK4PFJet450' : triggers_ak4pfjet450,
 		'AK8PFJet450' : triggers_ak8pfjet450,
 		'CaloJet500' : triggers_calojet500,
-		
+
 		##MET test
 		'MET170_HBHE' : triggers_MET170_HBHECleaned,
 		'MET170_BH' : triggers_MET170_BeamHaloCleaned,
 		'MET170_HBHE_BH' : triggers_MET170_HBHE_BeamHaloCleaned,
 		'MET190_TypeOne_HBHE_BH' : triggers_METTypeOne190_HBHE_BeamHaloCleaned,
-		
+
 		'MET100MHT100' : triggers_MET100MHT100,
 		'MET110MHT110' : triggers_MET110MHT110,
 		'MET120MHT120' : triggers_MET120MHT120,
-		
+
 		'highMHTMET' : triggers_highMHTMET,
 		## muon
 		'SingleMu' : triggers_1mu,
@@ -318,10 +354,12 @@ if run80X :
 		'Ele50HT400' : triggers_el50_ht400,
 		'EleHTMET' : triggers_el_ht350_met70 + triggers_el_ht400_met70,
 		'EleHT200' :triggers_el_ht200,
-		'EleHT400B': triggers_el_ht400_btag
+		'EleHT400B': triggers_el_ht400_btag,
+        'MuMu':triggers_mumu,
+        'EE':triggers_ee
 	}
-	
-elif run94X : 
+
+elif run94X :
 	from CMGTools.RootTools.samples.triggers_13TeV_2018_1l import *
 	triggerFlagsAna.triggerBits = {
 		'HT350' : triggers_HT350,
@@ -363,8 +401,8 @@ elif run94X :
 		'EleHTMET' : triggers_el_ht450_met50,
 		'EleHT450B': triggers_el_ht450_btag
 	}
-    
-else : 
+
+else :
 	from CMGTools.RootTools.samples.triggers_13TeV_2018_1l import *
 	triggerFlagsAna.triggerBits = {
 		'HT350' : triggers_HT350,
@@ -427,30 +465,30 @@ sequence = cfg.Sequence(susyCoreSequence+[
     ])
 
 if runMC:
-      
+
   print 'Going to process MC'
   print 'If It fails due to susy masses please comment out necessary lines in TTHAnalysis/python/analyzers/treeProducerSusyCore.py for now'
   sequence.remove(susyScanAna)
-  if runFastsim : 
+  if runFastsim :
       from CMGTools.RootTools.samples.samples_94X_FasSimTTJets import *
       selectedComponents = mcSamplesTTTJets
       jetAna.mcGT = "Fall17_FastsimV1"
       sequence.remove(triggerFlagsAna)
-      
-  else : 
+
+  else :
       if run80X:
           from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv3_1l import *
-      elif run94X: 
+      elif run94X:
           from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD_1l import *
       else :
           from CMGTools.RootTools.samples.samples_13TeV_RunIIAutumn18MiniAOD import *
           sequence.remove(PrefiringAnalyzer)
-          
+
       # apply a loose lepton skim to MC
       anyLepSkim.minLeptons = 1
       #pick the file you want to run on
-      selectedComponents = mcSamples
-      
+      selectedComponents = mcSamples #[TTJets_LO_HT800to1200]
+
 #  [TTJets_SingleLeptonFromTbar,TTJets_SingleLeptonFromTbar_ext,TTJets_SingleLeptonFromT,TTJets_DiLepton,TTJets_DiLepton_ext,
   if test==1:
     # test a single component, using a single thread.
@@ -470,7 +508,7 @@ if runMC:
       comp.fineSplitFactor = 1
       comp.splitFactor = len(comp.files)
   elif test==0:
-    selectedComponents = [TTJets_SingleLeptonFromTbar_genMET,TTJets_SingleLeptonFromT_genMET,TTJets_DiLepton_genMET]
+    ###selectedComponents = [TTJets_LO_HT800to1200]
     #selectedComponents = [WJetsToLNuHT[1]]
     #selectedComponents = mcSamples
     for comp in selectedComponents:
@@ -491,10 +529,10 @@ if runMC:
 elif runSig:
 
   print 'Going to process Signal, assuming it is FastSim'
-  
+
   # Set FastSim JEC
   jetAna.mcGT = "Spring16_FastSimV1_MC"
-  # No MET correcton 
+  # No MET correcton
   #metAna.metCollection     = "slimmedMETs"
   #metAna.noPUMetCollection = "slimmedMETs"
   #jetAna.mcGT = "Spring16_25nsFastSimV1_MC"
@@ -505,28 +543,44 @@ elif runSig:
   anyLepSkim.minLeptons = 0
 
   from CMGTools.RootTools.samples.samples_94X_signal import *
-  if multib: 
-      if run80X : 
+  from CMGTools.RootTools.samples.samples_pMSSM import *
+
+  if multib:
+      if run80X :
           selectedComponents = [SMS_T1tttt_TuneCUETP8M1]
           jetAna.mcGT = "Spring16_FastSimV1_MC"
-      else : 
+      else :
           selectedComponents = [SMS_T1ttttCP5_MVA]
           jetAna.mcGT = "Fall17_FastsimV1"
-  
+
   if zerob:
-      if run80X : 
+      if run80X :
           selectedComponents = [SMS_T5qqqqVV_TuneCUETP8M1]
           jetAna.mcGT = "Spring16_FastSimV1_MC"
-      else : 
+      else :
           selectedComponents = [SMS_T5qqqqVV_TuneCP2,SMS_T5qqqqVV_TuneCP2_ext]
           jetAna.mcGT = "Fall17_FastsimV1"
-  
-  if multib and zerob : print "Warning ! Both zero b and multi b is set to  True, you will be running Zero b signals ;"
-  if not (multib or zerob) : print 8*"*", "Error ! Choose a signal to process", 8*"*"
+
+  if pMSSM:
+    print("Doing pMSSM now!")
+    if run80X :
+          selectedComponents = [pMSSM_local] #[PMSSM_set_2_prompt_1_TuneCP2_v15_v4]  #
+          #[PMSSM_set_2_prompt_2_TuneCP2, PMSSM_set_2_prompt_1_TuneCP2_v15_v2,PMSSM_set_2_prompt_1_TuneCP2_v15_v4]
+
+          jetAna.mcGT = "Spring16_FastSimV1_MC"
+    else :
+          print("not 80X")
+          selectedComponents = mcSamples[:1] #s[pMSSM_local] #[PMSSM_set_2_prompt_1_TuneCP2_v15_v4]
+          jetAna.mcGT = "Fall17_FastsimV1"
+
+
+  #if multib and zerob : print "Warning ! Both zero b and multi b is set to  True, you will be running Zero b signals ;"
+  #if not (multib or zerob) : print 8*"*", "Error ! Choose a signal to process", 8*"*"
   if test==1:
     # test a single component, using a single thread.
     if multib: comp  = SMS_T1ttttCP5_MVA
     if zerob: comp  = SMS_T5qqqqVV_TuneCUETP8M1
+    if pMSSM: comp = mcSamples[-1] #pMSSM_local
     comp.files = comp.files[:2]
     selectedComponents = [comp]
     comp.splitFactor = 1
@@ -555,6 +609,9 @@ elif runSig:
     susyCounter.SUSYmodel = 'T1tttt'
   if zerob:
     susyCounter.SUSYmodel = 'T5qqqq'
+  if pMSSM:
+    susyCounter.SUSYmodel = 'pMSSM'
+
   susyCounter.SMS_mass_1 = "genSusyMGluino"
   susyCounter.SMS_mass_2 = "genSusyMNeutralino"
   susyCounter.SMS_varying_masses = ['genSusyMGluino','genSusyMNeutralino']
@@ -585,14 +642,14 @@ if runData : # For running on data
   # central samples
   if run80X:
       from CMGTools.RootTools.samples.samples_13TeV_DATA2016_17Jul2018_1l import *
-      selectedComponents = dataSamples_17Jul2018_1l
-  elif run94X : 
+      selectedComponents = dataSamples_17Jul2018_2l # for instance
+  elif run94X :
       from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
       selectedComponents = dataSamples_31Mar2018_1l
-  else : 
+  else :
       from CMGTools.RootTools.samples.samples_13TeV_DATA2018 import *
       selectedComponents = dataSamples_17Sep2018_1l
-      
+
   if (test != 0 and jsonAna in sequence):
       sequence.remove(jsonAna)
   if test==1:
@@ -600,7 +657,7 @@ if runData : # For running on data
     comp = selectedComponents[1]
 #    comp.files = comp.files[:1]
     comp.files = comp.files[10:11]
-    print comp.files 
+    print comp.files
     selectedComponents = [comp]
     comp.splitFactor = len(comp.files)
   elif test==2:
@@ -662,23 +719,28 @@ output_service = cfg.Service(
     name="outputfile",
     fname='treeProducerSusySingleLepton/tree.root',
     option='recreate'
-    )    
+    )
 outputService.append(output_service)
 
 ################### Preprocessing (DeepAK8) ##########################################
 from PhysicsTools.Heppy.utils.cmsswPreprocessor import CmsswPreprocessor
 #if run80X:
 #     fname1="$CMSSW_BASE/src/NNKit/FatJetNN/test/FatJetNN_80X.py"
-if runMC or runSig and not run104X: 
+print 'the three bools', runMC, runSig, run104X
+if (runMC  or runSig) and not run104X:
     fname1="./FatJetNN_94X_MC.py"
-elif runData and not run104X : 
+elif runData and not run104X :
     fname1="./FatJetNN_94X_data.py"
-elif runMC or runSig and run104X:
+elif (runMC  or runSig) and run104X:
+    print '\nhello, mate!\n'
     fname1="./FatJetNN_104X_MC.py"
 elif runData and run104X:
     fname1="./FatJetNN_104X_data.py"
 
+
+print 'gonna do', fname1
 preprocessor =  CmsswPreprocessor(fname1)
+#preprocessor = CmsswPreprocessor("$CMSSW_BASE/src/PhysicsTools/Heppy/test/makeFastSimWeightPR31285To36122.py")
 
 ttHFatJetAna.jetCol="deepntuplizer"
 #jetAna.jetCol = 'selectedUpdatedPatJets'
@@ -705,6 +767,6 @@ if getHeppyOption("nofetch") or getHeppyOption("isCrab"):
     if preprocessor: preprocessor.prefetch = False
 config = cfg.Config( components = selectedComponents,
                      sequence = sequence,
-                     services = outputService, 
-                     preprocessor = preprocessor, 
+                     services = outputService,
+                     preprocessor = preprocessor,
                      events_class = event_class)

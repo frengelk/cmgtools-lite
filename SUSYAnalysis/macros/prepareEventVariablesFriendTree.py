@@ -221,7 +221,7 @@ if options.queue:
     exit()
 
 if options.naf:
-	
+
     import os, sys
     import subprocess
 
@@ -261,23 +261,23 @@ if options.naf:
     if not os.path.exists(logdir): os.system("mkdir -p "+logdir)
     if  os.path.exists('submit_Friends.sh'):
         os.remove('submit_Friends.sh')
-	
+
     if  os.path.exists('condor.sub_all'):
         os.remove('condor.sub_all')
 
     print "batch Mode is on NAF is selected"
     print jobListName
     listtxt = open(str(jobListName),"r")
-    for line in listtxt: 
+    for line in listtxt:
         line = line.strip()
-        if line.startswith('#') : 
+        if line.startswith('#') :
             print "commented line continue!"
-            continue 
+            continue
         if len(line.strip()) == 0 :
             print "empty line continue!"
-            continue 
+            continue
         exten = line.split("-d ")[-1]
-        if "-c " in exten : 
+        if "-c " in exten :
 			exten = exten.split(" ")[0]+"_"+exten.split(" ")[-1]
         if os.path.exists(outdir+'/'+exten):
             shutil.rmtree(outdir+'/'+exten)
@@ -290,7 +290,7 @@ if options.naf:
         tempW_roRun = open(wrapsub, 'w')
         tempW_roRun.write(tempW)
         tempW_roRun.close()
-        if not options.bulk : 
+        if not options.bulk :
             os.system("cp templates/submit.condor "+condsub)
             temp = open(condsub).read()
             temp = temp.replace('@EXESH',str(os.getcwd())+"/"+wrapsub).replace('@LOGS',str(logdir)).replace('@time','60*60*2')
@@ -299,15 +299,18 @@ if options.naf:
             subCmd = 'condor_submit '+condsub
             print 'Going to submit', line.split("-d ")[-1] , 'jobs with', subCmd
             file = open('submit_Friends.sh','a')
-            file.write("\n") 
+            file.write("\n")
             file.write(subCmd)
-            file.close() 
-    if options.bulk : 
+            file.close()
+    if options.bulk :
         os.system("cp templates/submit.condor ./condor.sub_all")
         temp = open('condor.sub_all').read()
+        # add RAM
+        temp = temp.replace("+RequestRuntime", "RequestMemory = 5000\n+RequestRuntime" )
         temp = temp.replace('@EXESH',str(os.getcwd())+'/$(Chunk)/wrapnanoPost.sh').replace('@LOGS',str(logdir)).replace('@time','60*60*2').replace('Queue 1','queue Chunk matching dirs '+outdir+'/*')
         temp_toRun =  open('condor.sub_all', 'w')
         temp_toRun.write(temp)
+        print(temp)
         temp_toRun.close()
     if  os.path.exists('condor.sub_all'):
         os.system('condor_submit condor.sub_all')
@@ -375,6 +378,7 @@ def _runIt(myargs):
                     toRun[m] = True
         modulesToRun = [ (m,v) for (m,v) in MODULES if m in toRun ]
     el = EventLoop([ VariableProducer(options.treeDir,booker,modulesToRun), ])
+    #from IPython import embed;embed()
     el.loop([tb], eventRange=range)
     booker.done()
     fb.Close()
@@ -385,6 +389,11 @@ def _runIt(myargs):
 if options.jobs > 0:
     from multiprocessing import Pool
     pool = Pool(options.jobs)
+
+    #test case
+    #my_test_args=("name", args[0]+"/tree.root", args[1], False, range(0,1), 0)
+    #_runIt(my_test_args)
+
     ret  = dict(pool.map(_runIt, jobs)) if options.jobs > 0 else dict([_runIt(j) for j in jobs])
 else:
     ret = dict(map(_runIt, jobs))

@@ -66,13 +66,14 @@ if options.maxevents>0: os.environ["MAXNUMEVENTS"] = str(options.maxevents)
 os.environ["ONLYUNPACKED"] = str(options.only_unpacked)
 
 from PhysicsTools.HeppyCore.framework.heppy_loop import split
+#print(conf.components)
 for comp in conf.components:
     if getattr(comp,"useAAA",False):
-        raise RuntimeError, 'Components should have useAAA disabled in the cfg when running on crab - tune the behaviour of AAA in the crab submission instead!'
+        raise RuntimeError('Components should have useAAA disabled in the cfg when running on crab - tune the behaviour of AAA in the crab submission instead!')
     os.environ["DATASET"] = str(comp.name)
-    os.environ["NJOBS"] = str(len(split([comp])))
-    os.system("crab submit %s -c heppy_crab_config_env.py"%("--dryrun" if options.dryrun else ""))
-
+    os.environ["NJOBS"] = str(min(len(split([comp])), 10000)) # FIXME : setting limit on jobs
+    os.system("crab submit %s -c heppy_crab_config_env.py "%("--dryrun" if options.dryrun else ""))
+#print(os.environ)
 os.system("rm options.json")
 os.system("rm python.tar.gz")
 os.system("rm cmgdataset.tar.gz")

@@ -7,6 +7,8 @@ file = open( "heppy_crab_config.py", 'r' )
 cfg = imp.load_source( 'cfg', "heppy_crab_config.py", file)
 config = cfg.config
 
+os.environ["NJOBS"] = str(os.environ["NJOBS"]) #str(min(os.environ["NJOBS"], 10000)) #FIXME
+
 print "Will send dataset", os.environ["DATASET"], "with", os.environ["NJOBS"], "jobs"
 
 config.General.requestName = os.environ["DATASET"] + "_" + os.environ["CMG_VERSION"] # task name
@@ -17,7 +19,7 @@ config.Data.unitsPerJob = 10
 config.Data.totalUnits = config.Data.unitsPerJob * int(os.environ["NJOBS"])
 
 config.JobType.inputFiles.append(os.environ["CFG_FILE"])
-# arguments to pass to scriptExe. They have to be like "arg=value". 
+# arguments to pass to scriptExe. They have to be like "arg=value".
 config.JobType.scriptArgs = ["dataset="+os.environ["DATASET"], "total="+os.environ["NJOBS"], "useAAA="+os.environ["USEAAA"], "cfgfile="+os.environ["CFG_FILE"].split('/')[-1]]
 try: config.JobType.inputFiles.extend(os.environ["FILESTOSHIP"].split(','))
 except KeyError: pass

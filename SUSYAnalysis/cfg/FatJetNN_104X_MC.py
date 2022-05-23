@@ -19,7 +19,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.options = cms.untracked.PSet(
-   allowUnscheduled = cms.untracked.bool(True),  
+   allowUnscheduled = cms.untracked.bool(True),
    wantSummary=cms.untracked.bool(False)
 )
 
@@ -70,9 +70,14 @@ runMetCorAndUncFromMiniAOD (
             postfix = "ModifiedMET",
            )
 
+print("FastSimCase")
+process.FastSimWeightPR31285To36122 = cms.EDProducer("FastSimWeightPR31285To36122",
+                genCollection = cms.InputTag("prunedGenParticles"),
+                genJetTag = cms.InputTag('slimmedGenJets'),
+                recJetTag = cms.InputTag("slimmedJets")
+            )
 
-
-process.p = cms.Path( process.deepntuplizer * process.fullPatMetSequenceModifiedMET )
+process.p = cms.Path( process.deepntuplizer * process.fullPatMetSequenceModifiedMET * process.FastSimWeightPR31285To36122 )
 
 
 process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
@@ -92,7 +97,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
                                            #'drop *',
                                            'keep *_deepntuplizer_*_*',
                                            'keep *_slimmedMETsModifiedMET_*_*',
-                                           #'keep *_selectedUpdatedPatJets*_*_*',         
+                                           'keep *_FastSimWeightPR31285To36122_*_*',
                                            ),
 
  #   overrideInputFileSplitLevels = cms.untracked.bool(True)
@@ -100,4 +105,3 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
 
 
 process.endpath = cms.EndPath(process.MINIAODSIMoutput)
-
